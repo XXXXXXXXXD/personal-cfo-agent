@@ -223,7 +223,7 @@ select.form-input option {
   padding-bottom: 0.5rem;
 }
 
-.grid-3 > .glass-panel {
+.chart-row > .glass-panel {
   height: 400px;
 }
 
@@ -295,7 +295,7 @@ select.form-input option {
   }
 
   /* Reduce pie chart heights on mobile if stacked */
-  .grid-3 > .glass-panel {
+  .chart-row > .glass-panel {
     height: 300px !important;
   }
 }

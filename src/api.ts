@@ -29,9 +29,9 @@ export async function fetchYahooFinancePrice(symbol: string): Promise<number | n
   if (cached !== null) return cached;
 
   try {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d&_t=${Date.now()}`;
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`;
     // Use allorigins as a simple free CORS proxy for client-side fetching
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}&_t=${Date.now()}`;
     
     const res = await fetch(proxyUrl);
     const json = await res.json();
@@ -50,8 +50,8 @@ export async function fetchYahooFinancePrice(symbol: string): Promise<number | n
 // 1.b Fetch Stock Name and Price
 export async function fetchStockInfo(symbol: string): Promise<{ price: number, name: string } | null> {
   try {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d&_t=${Date.now()}`;
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`;
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}&_t=${Date.now()}`;
     
     const res = await fetch(proxyUrl);
     const json = await res.json();

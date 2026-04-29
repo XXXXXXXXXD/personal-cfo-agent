@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { onSnapshot } from 'firebase/firestore';
 import { addDoc } from 'firebase/firestore';
 import { transactionsRef } from '../firebaseClient';
-import { fetchPrice, fetchExchangeRate } from '../api';
+import { fetchPrice, fetchExchangeRate, getCached } from '../api';
 
 export default function StockPortfolio() {
   const [transactions, setTransactions] = useState<any[]>([]);
@@ -34,7 +34,23 @@ export default function StockPortfolio() {
         }
       });
 
-      const newPrices: Record<string, number> = {};
+      // 1. Instant Render from Cache (Stale-While-Revalidate)
+      const initialPrices: Record<string, number> = {};
+      symbolsToFetch.forEach(key => {
+        const [assetClass, symbol] = key.split('|');
+        const cacheKey = `price_${symbol}`;
+        const p = getCached<number>(cacheKey, true); // ignore age
+        if (p !== null) {
+          initialPrices[key] = p; // Portfolio uses raw USD prices
+        }
+      });
+
+      if (Object.keys(initialPrices).length > 0) {
+        setRealTimePrices(initialPrices);
+      }
+
+      // 2. Background Fetch Latest Prices
+      const newPrices: Record<string, number> = { ...initialPrices };
       const promises = Array.from(symbolsToFetch).map(async (key) => {
         const [assetClass, symbol] = key.split('|');
         const data = await fetchPrice(assetClass, symbol);

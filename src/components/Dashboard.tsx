@@ -258,7 +258,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="grid-3">
+      <div className="grid-3 chart-row">
         <div className="glass-panel">
           <h3 style={{ marginTop: 0 }}>Balance Sheet</h3>
           {computedBalanceSheet.filter(item => item.value > 0).length > 0 ? (
