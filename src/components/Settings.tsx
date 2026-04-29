@@ -13,8 +13,21 @@ export default function Settings() {
         return;
       }
       
-      const parsed = JSON.parse(configStr);
-      if (!parsed.apiKey || !parsed.projectId) {
+      let parsed;
+      try {
+        parsed = JSON.parse(configStr);
+      } catch (e) {
+        // Fallback for raw Javascript objects copied directly from Firebase Console
+        try {
+          // eslint-disable-next-line no-new-func
+          parsed = new Function('return ' + configStr.trim())();
+        } catch (err) {
+          alert('Invalid format. Please paste the Firebase config object correctly.');
+          return;
+        }
+      }
+      
+      if (!parsed || !parsed.apiKey || !parsed.projectId) {
         alert('Invalid Firebase Config: Missing apiKey or projectId');
         return;
       }
@@ -23,7 +36,7 @@ export default function Settings() {
       alert('Config saved! The application will now reload to apply the new database connection.');
       window.location.reload();
     } catch (e) {
-      alert('Invalid JSON format. Please paste the valid Firebase config object.');
+      alert('An error occurred while saving the configuration.');
     }
   };
 
