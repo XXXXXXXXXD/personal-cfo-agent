@@ -22,8 +22,8 @@ export default function Consumption() {
   const [items, setItems] = useState<any[]>([]);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(consumptionRef, (snapshot) => {
-      const fetchedItems = snapshot.docs.map(doc => ({
+    const unsubscribe = onSnapshot(consumptionRef, (snapshot: any) => {
+      const fetchedItems = snapshot.docs.map((doc: any) => ({
         id: doc.id,
         ...doc.data()
       }));

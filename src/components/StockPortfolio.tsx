@@ -14,8 +14,8 @@ export default function StockPortfolio() {
   const [editCost, setEditCost] = useState('');
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(transactionsRef, (snapshot) => {
-      const fetched = snapshot.docs.map(doc => doc.data());
+    const unsubscribe = onSnapshot(transactionsRef, (snapshot: any) => {
+      const fetched = snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }));
       setTransactions(fetched);
     });
     return () => unsubscribe();

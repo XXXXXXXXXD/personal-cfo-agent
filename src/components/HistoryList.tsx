@@ -20,8 +20,8 @@ export default function HistoryList() {
   const [addAvgCost, setAddAvgCost] = useState('');
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(transactionsRef, (snapshot) => {
-      const fetched = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const unsubscribe = onSnapshot(transactionsRef, (snapshot: any) => {
+      const fetched = snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }));
       
       // Sort by date ascending to compute correct avg cost over time
       fetched.sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());

@@ -17,8 +17,8 @@ export default function Dashboard() {
   const [isLoadingPrices, setIsLoadingPrices] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(transactionsRef, (snapshot) => {
-      const fetched = snapshot.docs.map(doc => doc.data());
+    const unsubscribe = onSnapshot(transactionsRef, (snapshot: any) => {
+      const fetched = snapshot.docs.map((doc: any) => doc.data());
       setTransactions(fetched);
     });
     return () => unsubscribe();
