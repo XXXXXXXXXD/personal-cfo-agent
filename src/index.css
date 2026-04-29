@@ -222,3 +222,43 @@ select.form-input option {
   border-bottom: 2px solid var(--glass-border);
   padding-bottom: 0.5rem;
 }
+
+.grid-3 > .glass-panel {
+  height: 400px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .app-container {
+    padding: 1rem;
+  }
+
+  .grid-2, .grid-3 {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .nav-tabs {
+    gap: 0.5rem;
+  }
+
+  .nav-tab {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.6rem;
+    flex-grow: 1;
+    text-align: center;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+
+  .glass-panel {
+    padding: 1rem;
+  }
+
+  /* Reduce pie chart heights on mobile if stacked */
+  .grid-3 > .glass-panel {
+    height: 350px !important;
+  }
+}

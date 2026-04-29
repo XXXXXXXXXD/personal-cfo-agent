@@ -239,8 +239,8 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="grid-3" style={{ height: '400px' }}>
-        <div className="glass-panel" style={{ height: '100%' }}>
+      <div className="grid-3">
+        <div className="glass-panel">
           <h3 style={{ marginTop: 0 }}>Balance Sheet</h3>
           {computedBalanceSheet.filter(item => item.value > 0).length > 0 ? (
             <ResponsiveContainer width="100%" height="85%">
@@ -274,7 +274,7 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="glass-panel" style={{ height: '100%' }}>
+        <div className="glass-panel">
           <h3 style={{ marginTop: 0 }}>Asset Allocation</h3>
           {computedAssetAllocation.length > 0 ? (
             <ResponsiveContainer width="100%" height="85%">
@@ -308,7 +308,7 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="glass-panel" style={{ height: '100%' }}>
+        <div className="glass-panel">
           <h3 style={{ marginTop: 0 }}>Liability Allocation</h3>
           {computedLiabilityAllocation.length > 0 ? (
             <ResponsiveContainer width="100%" height="85%">

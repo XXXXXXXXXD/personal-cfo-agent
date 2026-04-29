@@ -1,7 +1,33 @@
 // api.ts - Handling all external price fetching logic
+// Add caching to reduce API calls and prevent loading drops
+
+const CACHE_DURATION_MS = 15 * 60 * 1000; // 15 minutes cache
+
+function getCached<T>(key: string): T | null {
+  const cached = localStorage.getItem(key);
+  if (cached) {
+    try {
+      const parsed = JSON.parse(cached);
+      if (Date.now() - parsed.timestamp < CACHE_DURATION_MS) {
+        return parsed.data as T;
+      }
+    } catch (e) {
+      // ignore parse error
+    }
+  }
+  return null;
+}
+
+function setCached<T>(key: string, data: T) {
+  localStorage.setItem(key, JSON.stringify({ timestamp: Date.now(), data }));
+}
 
 // 1. Yahoo Finance (Proxy for US Stocks & Exchange Rates)
 export async function fetchYahooFinancePrice(symbol: string): Promise<number | null> {
+  const cacheKey = `price_${symbol}`;
+  const cached = getCached<number>(cacheKey);
+  if (cached !== null) return cached;
+
   try {
     const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`;
     // Use allorigins as a simple free CORS proxy for client-side fetching
@@ -13,6 +39,7 @@ export async function fetchYahooFinancePrice(symbol: string): Promise<number | n
     
     const result = data.chart.result[0];
     const price = result.meta.regularMarketPrice;
+    setCached(cacheKey, price);
     return price;
   } catch (error) {
     console.error(`Failed to fetch Yahoo Finance for ${symbol}:`, error);
@@ -42,12 +69,22 @@ export async function fetchStockInfo(symbol: string): Promise<{ price: number, n
 
 // 2. Fetch USD/TWD Exchange Rate
 export async function fetchExchangeRate(): Promise<number> {
+  const cacheKey = `exchange_rate_twd`;
+  const cached = getCached<number>(cacheKey);
+  if (cached !== null) return cached;
+
   const rate = await fetchYahooFinancePrice('TWD=X');
-  return rate || 32.5; // Fallback to 32.5 if API fails
+  const finalRate = rate || 32.5;
+  setCached(cacheKey, finalRate);
+  return finalRate; // Fallback to 32.5 if API fails
 }
 
 // 3. FinMind API (Taiwan Stocks)
 export async function fetchTWStockPrice(symbol: string): Promise<number | null> {
+  const cacheKey = `price_${symbol}`;
+  const cached = getCached<number>(cacheKey);
+  if (cached !== null) return cached;
+
   try {
     // Get date 7 days ago to ensure we catch the latest trading day
     const d = new Date();
@@ -61,6 +98,7 @@ export async function fetchTWStockPrice(symbol: string): Promise<number | null> 
     if (json.data && json.data.length > 0) {
       // Return the most recent close price
       const latest = json.data[json.data.length - 1];
+      setCached(cacheKey, latest.close);
       return latest.close;
     }
     return null;
@@ -82,18 +120,33 @@ const CRYPTO_MAP: Record<string, string> = {
 
 export async function fetchCryptoPrices(symbols: string[]): Promise<Record<string, number>> {
   try {
-    const ids = symbols.map(s => CRYPTO_MAP[s.toUpperCase()] || s.toLowerCase()).join(',');
-    if (!ids) return {};
+    const results: Record<string, number> = {};
+    const missingSymbols: string[] = [];
+
+    // Check cache first
+    symbols.forEach(s => {
+      const cached = getCached<number>(`price_${s}`);
+      if (cached !== null) {
+        results[s] = cached;
+      } else {
+        missingSymbols.push(s);
+      }
+    });
+
+    if (missingSymbols.length === 0) return results;
+
+    const ids = missingSymbols.map(s => CRYPTO_MAP[s.toUpperCase()] || s.toLowerCase()).join(',');
+    if (!ids) return results;
     
     const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`;
     const res = await fetch(url);
     const json = await res.json();
     
-    const results: Record<string, number> = {};
-    symbols.forEach(s => {
+    missingSymbols.forEach(s => {
       const id = CRYPTO_MAP[s.toUpperCase()] || s.toLowerCase();
       if (json[id] && json[id].usd) {
         results[s] = json[id].usd;
+        setCached(`price_${s}`, results[s]);
       }
     });
     return results;
