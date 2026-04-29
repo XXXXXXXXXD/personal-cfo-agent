@@ -1,14 +1,14 @@
 // api.ts - Handling all external price fetching logic
 // Add caching to reduce API calls and prevent loading drops
 
-const CACHE_DURATION_MS = 15 * 60 * 1000; // 15 minutes cache
+const CACHE_DURATION_MS = 60 * 1000; // 1 minute throttle to prevent spamming
 
-function getCached<T>(key: string): T | null {
+export function getCached<T>(key: string, ignoreAge: boolean = false): T | null {
   const cached = localStorage.getItem(key);
   if (cached) {
     try {
       const parsed = JSON.parse(cached);
-      if (Date.now() - parsed.timestamp < CACHE_DURATION_MS) {
+      if (ignoreAge || Date.now() - parsed.timestamp < CACHE_DURATION_MS) {
         return parsed.data as T;
       }
     } catch (e) {

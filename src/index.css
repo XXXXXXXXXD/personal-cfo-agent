@@ -230,12 +230,12 @@ select.form-input option {
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   .app-container {
-    padding: 1rem;
+    padding: 0.5rem;
   }
 
   .grid-2, .grid-3 {
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 0.75rem;
   }
 
   .nav-tabs {
@@ -243,22 +243,31 @@ select.form-input option {
   }
 
   .nav-tab {
-    font-size: 0.9rem;
-    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.5rem;
     flex-grow: 1;
     text-align: center;
   }
 
+  .dashboard-title {
+    font-size: 1.1rem;
+  }
+
   .stat-value {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
+    margin: 0.25rem 0;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
   }
 
   .glass-panel {
-    padding: 1rem;
+    padding: 0.75rem;
   }
 
   /* Reduce pie chart heights on mobile if stacked */
   .grid-3 > .glass-panel {
-    height: 350px !important;
+    height: 300px !important;
   }
 }

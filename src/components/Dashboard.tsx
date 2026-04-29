@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import { onSnapshot } from 'firebase/firestore';
 import { transactionsRef } from '../firebaseClient';
-import { fetchPrice, fetchExchangeRate } from '../api';
+import { fetchPrice, fetchExchangeRate, getCached } from '../api';
 
 const mockTimelineData = [
   { date: 'Jan', assets: 1200000 },
@@ -40,7 +40,26 @@ export default function Dashboard() {
           }
         });
 
-        const newPrices: Record<string, number> = {};
+        // 1. Instant Render from Cache (Stale-While-Revalidate)
+        const initialPrices: Record<string, number> = {};
+        const cachedRate = getCached<number>('exchange_rate_twd', true) || 32.5;
+        
+        symbolsToFetch.forEach(key => {
+          const [assetClass, symbol] = key.split('|');
+          const cacheKey = `price_${symbol}`;
+          const p = getCached<number>(cacheKey, true); // ignore age, just get last known
+          if (p !== null) {
+            initialPrices[key] = assetClass === 'US Stock' ? p * cachedRate : p;
+          }
+        });
+        
+        // Immediately show cached prices if we have them so UI doesn't drop to 0
+        if (Object.keys(initialPrices).length > 0) {
+          setRealTimePrices(initialPrices);
+        }
+
+        // 2. Background Fetch Latest Prices
+        const newPrices: Record<string, number> = { ...initialPrices };
         
         const promises = Array.from(symbolsToFetch).map(async (key) => {
           const [assetClass, symbol] = key.split('|');
@@ -194,7 +213,7 @@ export default function Dashboard() {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-        <h2 style={{ margin: 0 }}>Total Net Worth (TWD)</h2>
+        <h2 className="dashboard-title" style={{ margin: 0 }}>Total Net Worth (TWD)</h2>
         <div style={{ fontSize: '0.9rem', color: '#94a3b8' }}>
           {isLoadingPrices ? '🔄 抓取最新報價中...' : `USD/TWD 匯率: ${usdToTwd.toFixed(2)}`}
         </div>
@@ -232,7 +251,7 @@ export default function Dashboard() {
               <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
               <XAxis dataKey="date" stroke="#94a3b8" />
               <YAxis stroke="#94a3b8" tickFormatter={(value) => `NT$ ${(value/1000).toFixed(0)}k`} />
-              <RechartsTooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px' }} formatter={(value: number) => `NT$ ${Math.round(value).toLocaleString()}`} />
+              <RechartsTooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px' }} itemStyle={{ color: '#f8fafc' }} formatter={(value: number) => `NT$ ${Math.round(value).toLocaleString()}`} />
               <Area type="monotone" dataKey="assets" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorAssets)" />
             </AreaChart>
           </ResponsiveContainer>
@@ -262,6 +281,7 @@ export default function Dashboard() {
                 </Pie>
                 <RechartsTooltip 
                   contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px' }} 
+                  itemStyle={{ color: '#f8fafc' }}
                   formatter={(value: number) => `NT$ ${Math.round(value).toLocaleString()}`}
                 />
                 <Legend verticalAlign="bottom" height={36} wrapperStyle={{ color: '#94a3b8' }}/>
@@ -296,6 +316,7 @@ export default function Dashboard() {
                 </Pie>
                 <RechartsTooltip 
                   contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px' }} 
+                  itemStyle={{ color: '#f8fafc' }}
                   formatter={(value: number) => `NT$ ${Math.round(value).toLocaleString()}`}
                 />
                 <Legend verticalAlign="bottom" height={36} wrapperStyle={{ color: '#94a3b8' }}/>
@@ -330,6 +351,7 @@ export default function Dashboard() {
                 </Pie>
                 <RechartsTooltip 
                   contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px' }} 
+                  itemStyle={{ color: '#f8fafc' }}
                   formatter={(value: number) => `NT$ ${Math.round(value).toLocaleString()}`}
                 />
                 <Legend verticalAlign="bottom" height={36} wrapperStyle={{ color: '#94a3b8' }}/>
