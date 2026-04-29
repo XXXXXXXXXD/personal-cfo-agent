@@ -219,21 +219,21 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="grid-3" style={{ marginBottom: '2rem' }}>
+      <div className="grid-3 mobile-row-3" style={{ marginBottom: '2rem' }}>
         <div className="glass-panel">
-          <div className="stat-label">Total Assets (TWD)</div>
+          <div className="stat-label">Total Assets</div>
           <div className="stat-value">NT$ {Math.round(totalAssets).toLocaleString()}</div>
-          <div className="positive">即時股價估值</div>
+          <div className="positive mobile-hide">即時股價估值</div>
         </div>
         <div className="glass-panel">
-          <div className="stat-label">Total Liabilities (TWD)</div>
+          <div className="stat-label">Total Liab.</div>
           <div className="stat-value">NT$ {Math.round(totalLiabilities).toLocaleString()}</div>
-          <div className="negative">Auto-synced from DB</div>
+          <div className="negative mobile-hide">Auto-synced</div>
         </div>
         <div className="glass-panel">
-          <div className="stat-label">Net Worth (TWD)</div>
+          <div className="stat-label">Net Worth</div>
           <div className="stat-value">NT$ {Math.round(netWorth).toLocaleString()}</div>
-          <div className={netWorth >= 0 ? 'positive' : 'negative'}>即時資產結算</div>
+          <div className={`${netWorth >= 0 ? 'positive' : 'negative'} mobile-hide`}>即時結算</div>
         </div>
       </div>
 

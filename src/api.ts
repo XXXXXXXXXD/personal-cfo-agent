@@ -29,7 +29,7 @@ export async function fetchYahooFinancePrice(symbol: string): Promise<number | n
   if (cached !== null) return cached;
 
   try {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`;
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d&_t=${Date.now()}`;
     // Use allorigins as a simple free CORS proxy for client-side fetching
     const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
     
@@ -50,7 +50,7 @@ export async function fetchYahooFinancePrice(symbol: string): Promise<number | n
 // 1.b Fetch Stock Name and Price
 export async function fetchStockInfo(symbol: string): Promise<{ price: number, name: string } | null> {
   try {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`;
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d&_t=${Date.now()}`;
     const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
     
     const res = await fetch(proxyUrl);
@@ -91,7 +91,7 @@ export async function fetchTWStockPrice(symbol: string): Promise<number | null> 
     d.setDate(d.getDate() - 7);
     const startDate = d.toISOString().split('T')[0];
     
-    const url = `https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=${symbol}&start_date=${startDate}`;
+    const url = `https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=${symbol}&start_date=${startDate}&_t=${Date.now()}`;
     const res = await fetch(url);
     const json = await res.json();
     

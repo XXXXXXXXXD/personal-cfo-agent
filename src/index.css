@@ -253,6 +253,34 @@ select.form-input option {
     font-size: 1.1rem;
   }
 
+  .mobile-row-3 {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.5rem;
+  }
+
+  .mobile-row-3 .glass-panel {
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+
+  .mobile-row-3 .stat-label {
+    font-size: 0.65rem;
+    white-space: nowrap;
+  }
+
+  .mobile-row-3 .stat-value {
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  .mobile-hide {
+    display: none;
+  }
+
   .stat-value {
     font-size: 1.25rem;
     margin: 0.25rem 0;
